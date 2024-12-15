@@ -2,6 +2,10 @@ import matplotlib.pyplot as plt
 
 def plot_skew_with_opportunities(filtered_calls, filtered_puts, opportunities, st):
     fig, ax = plt.subplots(figsize=(10, 6))
+print("Type of filtered_calls:", type(filtered_calls))
+print("filtered_calls content:", filtered_calls)
+print("Type of filtered_puts:", type(filtered_puts))
+print("filtered_puts content:", filtered_puts)
     
     # Plot IV skew
     ax.plot(filtered_calls['strike'], filtered_calls['impliedVolatility'], label="Calls", color="blue")
