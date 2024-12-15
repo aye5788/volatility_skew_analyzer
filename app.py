@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd  # <-- Add this to fix the issue
 from src.fetch_data import fetch_options_data
 from src.preprocess_data import preprocess_options_data
 from src.interpret_skew import identify_calendar_opportunities, identify_butterfly_opportunities
@@ -41,7 +42,7 @@ if ticker:
         # Display identified opportunities in a table
         if opportunities:
             st.write("### Identified Opportunities")
-            opportunities_df = pd.DataFrame(opportunities)
+            opportunities_df = pd.DataFrame(opportunities)  # <-- Issue fixed here
             st.dataframe(opportunities_df)
         else:
             st.write("No opportunities found.")
