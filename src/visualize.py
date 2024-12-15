@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import pandas as pd
 
-def plot_skew_with_opportunities(calls_df, puts_df, opportunities):
+def plot_skew_with_opportunities(calls_df, puts_df, opportunities, st):
     """
     Plots the volatility skew with strategy opportunities.
     """
@@ -21,9 +21,9 @@ def plot_skew_with_opportunities(calls_df, puts_df, opportunities):
     plt.ylabel("Implied Volatility")
     plt.legend()
     plt.grid()
-    plt.show()
+    st.pyplot(plt)
 
-def plot_volatility_surface(calls_df, puts_df):
+def plot_volatility_surface(calls_df, puts_df, st):
     """
     Plots a 3D volatility surface for calls and puts combined.
     """
