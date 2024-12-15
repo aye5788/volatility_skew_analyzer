@@ -27,18 +27,26 @@ def plot_volatility_surface(calls_df, puts_df):
     """
     Plots a 3D volatility surface for calls and puts combined.
     """
-    fig = plt.figure(figsize=(10, 8))
-    ax = fig.add_subplot(111, projection='3d')
-
     combined = pd.concat([calls_df, puts_df])
-    x = combined['strike']
-    y = (combined['expiration'] - pd.Timestamp.now()).dt.days
-    z = combined['impliedVolatility']
 
-    ax.scatter(x, y, z, c=z, cmap="viridis", alpha=0.8)
-    ax.set_title("Volatility Surface")
-    ax.set_xlabel("Strike Price")
-    ax.set_ylabel("Days to Expiration")
-    ax.set_zlabel("Implied Volatility")
-    plt.colorbar(ax.scatter(x, y, z, c=z, cmap="viridis"))
-    plt.show()
+    if combined.empty:
+        st.write("No data available to plot the Volatility Surface.")
+        return
+
+    try:
+        x = combined['strike']
+        y = (combined['expiration'] - pd.Timestamp.now()).dt.days
+        z = combined['impliedVolatility']
+
+        fig = plt.figure(figsize=(10, 8))
+        ax = fig.add_subplot(111, projection='3d')
+        scatter = ax.scatter(x, y, z, c=z, cmap="viridis", alpha=0.8)
+
+        ax.set_title("Volatility Surface")
+        ax.set_xlabel("Strike Price")
+        ax.set_ylabel("Days to Expiration")
+        ax.set_zlabel("Implied Volatility")
+        fig.colorbar(scatter, ax=ax, shrink=0.5, aspect=5)
+        st.pyplot(fig)
+    except Exception as e:
+        st.write("Error while plotting the Volatility Surface:", e)
