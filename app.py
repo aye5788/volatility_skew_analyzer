@@ -2,7 +2,7 @@ import streamlit as st
 from src.fetch_data import fetch_options_data
 from src.preprocess_data import preprocess_options_data
 from src.visualize import plot_skew_with_opportunities
-from src.interpret_skew import identify_butterfly_opportunities
+from src.interpret_skew import identify_opportunities  # Correct import
 
 # Streamlit App Title
 st.title("Volatility Skew and Surface Analyzer")
@@ -33,7 +33,7 @@ if ticker:
 
     # Identify Butterfly Spread Opportunities
     st.write("### Identified Butterfly Spread Opportunities")
-    butterfly_opportunities = identify_butterfly_opportunities(calls_data)
+    butterfly_opportunities = identify_opportunities(calls_data)  # Fixed function call
 
     if butterfly_opportunities:
         st.dataframe(butterfly_opportunities)
@@ -43,3 +43,4 @@ if ticker:
     # Plot Volatility Skew with Butterfly Opportunities
     st.subheader("Volatility Skew with Opportunities")
     plot_skew_with_opportunities(st, calls_data, puts_data, butterfly_opportunities)
+
