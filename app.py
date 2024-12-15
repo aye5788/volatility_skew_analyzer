@@ -31,9 +31,18 @@ if ticker:
     st.subheader("Puts Data Preview")
     st.dataframe(puts_data.head())
 
+    # Allow User to Select Expiry Date
+    st.subheader("Select Expiry Date")
+    unique_expiries = calls_data['expiry'].unique()
+    selected_expiry = st.selectbox("Choose Expiry Date", unique_expiries)
+
+    # Filter Data by Selected Expiry
+    filtered_calls = calls_data[calls_data['expiry'] == selected_expiry]
+    filtered_puts = puts_data[puts_data['expiry'] == selected_expiry]
+
     # Identify Butterfly Spread Opportunities
     st.write("### Identified Butterfly Spread Opportunities")
-    butterfly_opportunities = identify_opportunities(calls_data, puts_data)
+    butterfly_opportunities = identify_opportunities(filtered_calls, filtered_puts)
 
     if butterfly_opportunities:
         st.dataframe(butterfly_opportunities)
@@ -42,4 +51,4 @@ if ticker:
 
     # Plot Volatility Skew with Butterfly Opportunities
     st.subheader("Volatility Skew with Opportunities")
-    plot_skew_with_opportunities(st, calls_data, puts_data, butterfly_opportunities)
+    plot_skew_with_opportunities(st, filtered_calls, filtered_puts, butterfly_opportunities)
