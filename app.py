@@ -1,5 +1,5 @@
 import streamlit as st
-import pandas as pd  # <-- Add this to fix the issue
+import pandas as pd  # Ensure pandas is imported
 from src.fetch_data import fetch_options_data
 from src.preprocess_data import preprocess_options_data
 from src.interpret_skew import identify_calendar_opportunities, identify_butterfly_opportunities
@@ -17,6 +17,12 @@ if ticker:
     calls_df, puts_df = fetch_options_data(ticker)
     calls_df = preprocess_options_data(calls_df)
     puts_df = preprocess_options_data(puts_df)
+
+    # Debugging: Preview data
+    st.write("Calls Data Preview")
+    st.dataframe(calls_df.head())
+    st.write("Puts Data Preview")
+    st.dataframe(puts_df.head())
 
     # Allow user to select expiration date
     expirations = sorted(calls_df['expiration'].unique())
@@ -42,7 +48,7 @@ if ticker:
         # Display identified opportunities in a table
         if opportunities:
             st.write("### Identified Opportunities")
-            opportunities_df = pd.DataFrame(opportunities)  # <-- Issue fixed here
+            opportunities_df = pd.DataFrame(opportunities)
             st.dataframe(opportunities_df)
         else:
             st.write("No opportunities found.")
@@ -51,3 +57,4 @@ if ticker:
     with tabs[1]:
         st.write("### Volatility Surface")
         plot_volatility_surface(calls_df, puts_df)
+
