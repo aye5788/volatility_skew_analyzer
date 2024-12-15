@@ -38,7 +38,7 @@ if ticker:
 
     # Visualize and Display
     st.subheader("Volatility Skew with Opportunities")
-    plot_skew_with_opportunities(calls_data, puts_data, opportunities)
+    plot_skew_with_opportunities(st, calls_data, puts_data, opportunities)
 
     # Display identified opportunities
     if opportunities:
