@@ -25,18 +25,18 @@ if ticker:
     calls_data = preprocess_options_data(calls_data)
     puts_data = preprocess_options_data(puts_data)
 
-    # Display preview of the options data
+    # Display Calls and Puts Data Preview
     st.subheader("Calls Data Preview")
     st.dataframe(calls_data.head())
 
     st.subheader("Puts Data Preview")
     st.dataframe(puts_data.head())
 
-    # Identify butterfly opportunities
+    # Identify Butterfly Opportunities
     st.write("### Analyzing for Butterfly Spread Opportunities...")
     opportunities = identify_opportunities(calls_data, puts_data)
 
-    # Display and visualize the opportunities
+    # Display and visualize opportunities
     if opportunities:
         st.write("### Identified Butterfly Spread Opportunities")
         st.dataframe(opportunities)
