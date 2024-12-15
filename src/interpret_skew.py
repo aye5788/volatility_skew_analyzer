@@ -1,3 +1,5 @@
+import numpy as np
+
 def identify_calendar_opportunities(calls_df, puts_df, iv_threshold=0.1):
     """
     Identify opportunities for calendar spreads.
@@ -9,13 +11,19 @@ def identify_calendar_opportunities(calls_df, puts_df, iv_threshold=0.1):
             short_iv = call_strikes['impliedVolatility'].iloc[0]
             long_iv = call_strikes['impliedVolatility'].iloc[-1]
             if short_iv > (long_iv + iv_threshold):
-                opportunities.append({
+                opportunity = {
                     "strike": strike,
                     "short_iv": short_iv,
                     "long_iv": long_iv,
                     "opportunity_type": "Calendar Spread"
-                })
+                }
+                # Validate keys
+                if all(k in opportunity for k in ["strike", "short_iv", "long_iv", "opportunity_type"]):
+                    opportunities.append(opportunity)
+                else:
+                    print(f"Skipping opportunity with missing keys: {opportunity}")
     return opportunities
+
 
 def identify_butterfly_opportunities(calls_df, threshold=0.05):
     """
