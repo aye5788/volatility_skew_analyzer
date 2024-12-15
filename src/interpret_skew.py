@@ -8,22 +8,25 @@ def identify_calendar_opportunities(calls_df, puts_df, iv_threshold=0.1):
     for strike in sorted(calls_df['strike'].unique()):
         call_strikes = calls_df[calls_df['strike'] == strike]
         if len(call_strikes) > 1:
-            short_iv = call_strikes['impliedVolatility'].iloc[0]
-            long_iv = call_strikes['impliedVolatility'].iloc[-1]
-            if short_iv > (long_iv + iv_threshold):
-                opportunity = {
-                    "strike": strike,
-                    "short_iv": short_iv,
-                    "long_iv": long_iv,
-                    "opportunity_type": "Calendar Spread"
-                }
-                # Validate keys
-                if all(k in opportunity for k in ["strike", "short_iv", "long_iv", "opportunity_type"]):
+            short_iv = float(call_strikes['impliedVolatility'].iloc[0])
+            long_iv = float(call_strikes['impliedVolatility'].iloc[-1])
+            
+            # Check for valid implied volatility
+            if not np.isnan(short_iv) and not np.isnan(long_iv):
+                if short_iv > (long_iv + iv_threshold):
+                    opportunity = {
+                        "strike": strike,
+                        "short_iv": short_iv,
+                        "long_iv": long_iv,
+                        "opportunity_type": "Calendar Spread"
+                    }
+                    # Append directly (no redundant validation)
                     opportunities.append(opportunity)
-                else:
-                    print(f"Skipping opportunity with missing keys: {opportunity}")
+            else:
+                print(f"Skipping due to NaN IVs: strike={strike}, short_iv={short_iv}, long_iv={long_iv}")
+        else:
+            print(f"Skipping due to insufficient strikes at {strike}")
     return opportunities
-
 
 def identify_butterfly_opportunities(calls_df, threshold=0.05):
     """
