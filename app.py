@@ -1,5 +1,5 @@
 import streamlit as st
-import pandas as pd  # Ensure pandas is imported
+import pandas as pd
 from src.fetch_data import fetch_options_data
 from src.preprocess_data import preprocess_options_data
 from src.interpret_skew import identify_calendar_opportunities, identify_butterfly_opportunities
@@ -43,7 +43,7 @@ if ticker:
         opportunities = calendar_opps + butterfly_opps
 
         # Plot skew
-        plot_skew_with_opportunities(filtered_calls, filtered_puts, opportunities)
+        plot_skew_with_opportunities(filtered_calls, filtered_puts, opportunities, st)
 
         # Display identified opportunities in a table
         if opportunities:
@@ -56,5 +56,4 @@ if ticker:
     # Tab 2: Volatility Surface
     with tabs[1]:
         st.write("### Volatility Surface")
-        plot_volatility_surface(calls_df, puts_df)
-
+        plot_volatility_surface(calls_df, puts_df, st)
