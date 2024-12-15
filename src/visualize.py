@@ -8,8 +8,8 @@ print("Type of filtered_puts:", type(filtered_puts))
 print("filtered_puts content:", filtered_puts)
     
     # Plot IV skew
-    ax.plot(filtered_calls['strike'], filtered_calls['impliedVolatility'], label="Calls", color="blue")
-    ax.plot(filtered_puts['strike'], filtered_puts['impliedVolatility'], label="Puts", color="red")
+        ax.plot(filtered_calls['strike'], filtered_calls['impliedVolatility'], label="Calls", color="blue")
+        ax.plot(filtered_puts['strike'], filtered_puts['impliedVolatility'], label="Puts", color="red")
     
     # Highlight butterfly spread opportunities
     for opp in opportunities:
