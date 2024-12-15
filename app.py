@@ -1,48 +1,38 @@
-import streamlit as st
 import pandas as pd
-from src.fetch_data import fetch_options_data
+import streamlit as st
 from src.preprocess_data import preprocess_options_data
 from src.visualize import plot_skew_with_opportunities
-from src.interpret_skew import identify_butterfly_opportunities
+from src.calculate_metrics import calculate_opportunity_metrics
 
-# Streamlit App
 st.title("Volatility Skew and Surface Analyzer")
 
-# Ticker input
 ticker = st.text_input("Enter Ticker Symbol:", value="AAPL")
+
 if ticker:
     st.write(f"Fetching data for {ticker}...")
-    options_data = fetch_options_data(ticker)
-    calls_data, puts_data = preprocess_options_data(options_data)
     
-    # Show preview of the calls and puts data
+    # Fetch and preprocess options data
+    options_data = fetch_options_data(ticker)  # Ensure this function returns correctly structured data
+    if isinstance(options_data, tuple):
+        calls_data, puts_data = options_data  # Unpack tuple
+    else:
+        st.error("Error: `fetch_options_data` did not return expected tuple format.")
+        st.stop()
+
+    calls_data = preprocess_options_data(calls_data)
+    puts_data = preprocess_options_data(puts_data)
+
+    # Display preview of the calls and puts data
     st.subheader("Calls Data Preview")
     st.dataframe(calls_data.head())
-    
     st.subheader("Puts Data Preview")
     st.dataframe(puts_data.head())
-    
-    # Select expiration date
-    expiration_dates = calls_data['expiration'].unique()
-    selected_expiration = st.selectbox("Select Expiration Date:", expiration_dates)
-    
-    # Filter data for the selected expiration
-    filtered_calls = calls_data[calls_data['expiration'] == selected_expiration]
-    filtered_puts = puts_data[puts_data['expiration'] == selected_expiration]
-    
-    # Analyze butterfly opportunities
-    stock_price = options_data['underlying_price'][0]
-    stock_iv = options_data['impliedVolatility'][0] / 100  # Normalize to decimal
-    opportunities = identify_butterfly_opportunities(filtered_calls, stock_price, stock_iv)
-    
-    # Plot volatility skew with opportunities
-    st.subheader("Volatility Skew with Opportunities")
-    plot_skew_with_opportunities(filtered_calls, filtered_puts, opportunities, st)
-    
-    # Display identified opportunities in a table
+
+    # Calculate and display opportunities
+    opportunities = calculate_opportunity_metrics(calls_data, puts_data)
     if opportunities:
         st.write("### Identified Opportunities")
-        opportunities_df = pd.DataFrame(opportunities)
-        st.dataframe(opportunities_df)
+        st.dataframe(opportunities)
     else:
-        st.write("No opportunities found.")
+        st.write("No opportunities identified.")
+
