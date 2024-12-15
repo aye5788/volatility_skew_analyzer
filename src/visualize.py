@@ -3,16 +3,7 @@ import matplotlib.pyplot as plt
 def plot_skew_with_opportunities(st, filtered_calls, filtered_puts, opportunities):
     """
     Plots the implied volatility skew for calls and puts, highlighting opportunities.
-    Includes debugging statements to verify data at each step.
     """
-    # Debugging: Print the input DataFrames to check for issues
-    st.write("### Debugging: Filtered Calls Data")
-    st.dataframe(filtered_calls)
-    st.write("### Debugging: Filtered Puts Data")
-    st.dataframe(filtered_puts)
-    st.write("### Debugging: Opportunities Data")
-    st.json(opportunities)
-
     # Check if DataFrames are empty
     if filtered_calls.empty or filtered_puts.empty:
         st.error("Error: One or both input DataFrames are empty.")
@@ -21,6 +12,7 @@ def plot_skew_with_opportunities(st, filtered_calls, filtered_puts, opportunitie
     # Check if opportunities are empty
     if not opportunities:
         st.warning("No opportunities to display on the plot.")
+        return
     
     # Create a figure
     try:
@@ -50,8 +42,6 @@ def plot_skew_with_opportunities(st, filtered_calls, filtered_puts, opportunitie
                     s=50, 
                     label="Butterfly Spread" if 'Butterfly Spread' in opp['opportunity_type'] else ""
                 )
-            else:
-                st.warning(f"Skipping opportunity with missing keys: {opp}")
 
         # Add labels and legend
         ax.set_xlabel("Strike Price")
@@ -62,5 +52,6 @@ def plot_skew_with_opportunities(st, filtered_calls, filtered_puts, opportunitie
         # Display the plot in Streamlit
         st.pyplot(fig)
     except Exception as e:
-        # Debugging: Print any exceptions
+        # Display error message in case of exception
         st.error(f"An error occurred while plotting: {e}")
+
