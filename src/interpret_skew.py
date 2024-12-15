@@ -1,4 +1,7 @@
 def identify_calendar_opportunities(calls_df, puts_df, iv_threshold=0.1):
+    """
+    Identify opportunities for calendar spreads.
+    """
     opportunities = []
     for strike in sorted(calls_df['strike'].unique()):
         call_strikes = calls_df[calls_df['strike'] == strike]
@@ -15,6 +18,9 @@ def identify_calendar_opportunities(calls_df, puts_df, iv_threshold=0.1):
     return opportunities
 
 def identify_butterfly_opportunities(calls_df, threshold=0.05):
+    """
+    Identify opportunities for butterfly spreads.
+    """
     opportunities = []
     strikes = sorted(calls_df['strike'].unique())
     for i in range(1, len(strikes) - 1):
