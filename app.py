@@ -5,19 +5,26 @@ from src.fetch_data import fetch_options_data
 from src.preprocess_data import preprocess_options_data
 from src.visualize import plot_skew_with_interpretation
 from src.interpret_skew import identify_opportunities
-st.set_page_config(layout="wide")
 
 # Helper function to clean options data
 def clean_options_data(df):
+    """
+    Cleans options data by extracting ticker, expiry, and strike columns.
+    Removes unnecessary columns for clarity.
+    """
+    # Extract expiry date from contractSymbol
     df['expiry'] = df['contractSymbol'].apply(
         lambda x: re.search(r'(\d{6})', x).group(1) if re.search(r'(\d{6})', x) else None
     )
     df['expiry'] = pd.to_datetime(df['expiry'], format='%y%m%d', errors='coerce')
+    
+    # Extract ticker (part before numeric in contractSymbol)
     df['ticker'] = df['contractSymbol'].apply(lambda x: re.split(r'(\d)', x, 1)[0])
 
     # Keep only relevant columns
     df = df[['ticker', 'expiry', 'strike', 'bid', 'ask', 'lastPrice', 'impliedVolatility']]
-    df = df.rename(columns={'lastPrice': 'last_price'})
+    df = df.rename(columns={'lastPrice': 'last_price'})  # Rename for clarity
+    
     return df
 
 # Streamlit App Title
@@ -55,24 +62,17 @@ if ticker:
         filtered_calls = calls_data[calls_data['expiry'] == selected_expiry]
         filtered_puts = puts_data[puts_data['expiry'] == selected_expiry]
 
-        # Identify and display Butterfly Spread Opportunities
+        # Identify Butterfly Spread Opportunities
         st.subheader("Identified Butterfly Spread Opportunities")
         butterfly_opportunities = identify_opportunities(filtered_calls, filtered_puts)
 
-        if butterfly_opportunities:
+        # Safely check for empty DataFrame
+        if not butterfly_opportunities.empty:
             opportunities_df = pd.DataFrame(butterfly_opportunities)
-            st.dataframe(opportunities_df)
+            st.dataframe(opportunities_df)  # Display opportunities
         else:
-            st.write("No butterfly spread opportunities identified.")
+            st.write("No butterfly opportunities found.")
 
-        # Plot Volatility Skew
+        # Plot Volatility Skew and Display Interpretation
         st.subheader("Volatility Skew")
         plot_skew_with_interpretation(st, filtered_calls, filtered_puts)
-
-        # Additional Interpretation
-        st.subheader("Interpretation of the Skew")
-        st.write("""
-        The implied volatility skew highlights market sentiment:
-        - **Higher IV for puts** indicates bearish sentiment, as traders are willing to pay more for downside protection.
-        - **Higher IV for calls** may signal bullish sentiment or hedging activity.
-        """)
