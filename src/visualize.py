@@ -1,68 +1,43 @@
 import matplotlib.pyplot as plt
-import numpy as np
-import seaborn as sns
+import pandas as pd
 
-def plot_skew_with_interpretation(st, calls_data, puts_data):
+def plot_skew_with_interpretation(st, calls_df, puts_df):
     """
-    Plots the implied volatility skew for calls and puts and outputs an interpretation.
-    """
+    Plots the implied volatility skew for calls and puts.
+    Provides an interpretation based on the skew trend.
 
-    # Check if data exists
-    if calls_data.empty or puts_data.empty:
-        st.error("No data available to plot.")
-        return
-
-    # Initialize the figure
-    plt.figure(figsize=(10, 6))
-    sns.set(style="whitegrid")
-
-    # Sort data by strike price for better readability
-    calls_data = calls_data.sort_values(by="strike")
-    puts_data = puts_data.sort_values(by="strike")
-
-    # Plot calls and puts IV skew
-    plt.plot(
-        calls_data['strike'], calls_data['impliedVolatility'], 
-        label='Calls IV', color='blue', linewidth=1.5
-    )
-    plt.plot(
-        puts_data['strike'], puts_data['impliedVolatility'], 
-        label='Puts IV', color='red', linewidth=1.5
-    )
-
-    # Add chart details
-    plt.title("Implied Volatility Skew")
-    plt.xlabel("Strike Price")
-    plt.ylabel("Implied Volatility")
-    plt.legend()
-    plt.tight_layout()
-
-    # Display the plot in Streamlit
-    st.pyplot(plt)
-
-    # Interpretation logic
-    interpret_skew(st, calls_data, puts_data)
-
-
-def interpret_skew(st, calls_data, puts_data):
-    """
-    Outputs an interpretation of the volatility skew.
+    Args:
+        st: Streamlit object for display.
+        calls_df (pd.DataFrame): DataFrame containing calls data.
+        puts_df (pd.DataFrame): DataFrame containing puts data.
     """
 
-    call_skew = np.polyfit(calls_data['strike'], calls_data['impliedVolatility'], 1)[0]
-    put_skew = np.polyfit(puts_data['strike'], puts_data['impliedVolatility'], 1)[0]
+    # Set up the plot
+    fig, ax = plt.subplots(figsize=(10, 6))
 
-    st.subheader("Volatility Skew Interpretation")
+    # Plot IV skew for calls and puts
+    ax.plot(calls_df['strike'], calls_df['impliedVolatility'], label="Calls IV", marker='o')
+    ax.plot(puts_df['strike'], puts_df['impliedVolatility'], label="Puts IV", marker='o')
 
-    def get_interpretation(skew, option_type):
-        if skew > 0:
-            return f"The {option_type} skew is upward sloping, indicating higher IV for OTM options. This suggests hedging demand or market fear."
-        elif skew < 0:
-            return f"The {option_type} skew is downward sloping, indicating higher IV for ITM options. This suggests supply or market complacency."
-        else:
-            return f"The {option_type} skew is flat, indicating balanced demand across strikes."
+    # Beautify chart
+    ax.set_title("Implied Volatility Skew")
+    ax.set_xlabel("Strike Price")
+    ax.set_ylabel("Implied Volatility")
+    ax.legend()
+    ax.grid(True)
 
-    # Display interpretation
-    st.write(get_interpretation(call_skew, "calls"))
-    st.write(get_interpretation(put_skew, "puts"))
+    # Display plot
+    st.pyplot(fig)
+
+    # Interpretation of the skew
+    st.subheader("Interpretation of the Skew")
+    avg_call_iv = calls_df['impliedVolatility'].mean()
+    avg_put_iv = puts_df['impliedVolatility'].mean()
+
+    if avg_call_iv > avg_put_iv:
+        st.write("The IV for calls is higher than puts. This may indicate a bullish sentiment.")
+    elif avg_call_iv < avg_put_iv:
+        st.write("The IV for puts is higher than calls. This may indicate a bearish sentiment.")
+    else:
+        st.write("The IV for calls and puts are similar. The market sentiment appears neutral.")
 
