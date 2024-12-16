@@ -62,16 +62,14 @@ if ticker:
         filtered_calls = calls_data[calls_data['expiry'] == selected_expiry]
         filtered_puts = puts_data[puts_data['expiry'] == selected_expiry]
 
-        # Identify Butterfly Spread Opportunities
+        # Identify Butterfly Spread Opportunities (above the chart)
         butterfly_opportunities = identify_opportunities(filtered_calls, filtered_puts)
+        st.subheader("Identified Butterfly Spread Opportunities")
+        if butterfly_opportunities:
+            st.dataframe(butterfly_opportunities)
+        else:
+            st.write("No butterfly spread opportunities identified.")
 
         # Plot Volatility Skew and Display Interpretation
         st.subheader("Volatility Skew")
         plot_skew_with_interpretation(st, filtered_calls, filtered_puts)
-
-        # Display Butterfly Spread Opportunities
-        if butterfly_opportunities:
-            st.subheader("Identified Butterfly Spread Opportunities")
-            st.dataframe(butterfly_opportunities)
-        else:
-            st.write("No butterfly spread opportunities identified.")
