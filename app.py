@@ -12,6 +12,10 @@ def clean_options_data(df):
     Cleans options data by extracting ticker, expiry, and strike columns.
     Removes unnecessary columns for clarity.
     """
+    if 'contractSymbol' not in df.columns:
+        st.error("Error: 'contractSymbol' column missing in options data.")
+        st.stop()
+
     # Extract expiry date from contractSymbol
     df['expiry'] = df['contractSymbol'].apply(
         lambda x: re.search(r'(\d{6})', x).group(1) if re.search(r'(\d{6})', x) else None
@@ -48,6 +52,15 @@ if ticker:
     calls_data = preprocess_options_data(calls_data)
     puts_data = preprocess_options_data(puts_data)
 
+    # Debugging: Log column names
+    st.write("Calls Data Columns:", calls_data.columns)
+    st.write("Puts Data Columns:", puts_data.columns)
+
+    # Validate impliedVolatility column
+    if 'impliedVolatility' not in calls_data.columns or 'impliedVolatility' not in puts_data.columns:
+        st.error("Error: 'impliedVolatility' column is missing in the processed data.")
+        st.stop()
+
     # Clean options data for better readability
     calls_data = clean_options_data(calls_data)
     puts_data = clean_options_data(puts_data)
@@ -77,12 +90,15 @@ if ticker:
 
         # Identify Butterfly Spread Opportunities
         st.write("### Identified Butterfly Spread Opportunities")
-        butterfly_opportunities = identify_opportunities(filtered_calls, filtered_puts)
-
-        if butterfly_opportunities:
-            st.dataframe(butterfly_opportunities)
-        else:
-            st.write("No butterfly spread opportunities identified.")
+        try:
+            butterfly_opportunities = identify_opportunities(filtered_calls, filtered_puts)
+            if butterfly_opportunities:
+                st.dataframe(butterfly_opportunities)
+            else:
+                st.write("No butterfly spread opportunities identified.")
+        except KeyError as e:
+            st.error(f"Missing column error: {e}")
+            st.stop()
 
         # Plot Volatility Skew with Butterfly Opportunities
         st.subheader("Volatility Skew with Opportunities")
