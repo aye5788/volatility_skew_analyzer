@@ -3,20 +3,21 @@ import pandas as pd
 import re
 from src.fetch_data import fetch_options_data
 from src.preprocess_data import preprocess_options_data
-from src.visualize import plot_skew_with_opportunities
+from src.visualize import plot_skew_with_interpretation
 from src.interpret_skew import identify_opportunities
 
 # Helper function to clean options data
 def clean_options_data(df):
     """
     Cleans options data by extracting ticker, expiry, and strike columns.
+    Removes unnecessary columns for clarity.
     """
     # Extract expiry date from contractSymbol
     df['expiry'] = df['contractSymbol'].apply(
         lambda x: re.search(r'(\d{6})', x).group(1) if re.search(r'(\d{6})', x) else None
     )
     df['expiry'] = pd.to_datetime(df['expiry'], format='%y%m%d', errors='coerce')
-
+    
     # Extract ticker (part before numeric in contractSymbol)
     df['ticker'] = df['contractSymbol'].apply(lambda x: re.split(r'(\d)', x, 1)[0])
 
@@ -43,13 +44,16 @@ if ticker:
         st.error("Error: `fetch_options_data` did not return expected tuple format.")
         st.stop()
 
-    # Preprocess and clean calls and puts data
+    # Preprocess calls and puts data
     calls_data = preprocess_options_data(calls_data)
     puts_data = preprocess_options_data(puts_data)
+
+    # Clean options data for better readability
     calls_data = clean_options_data(calls_data)
     puts_data = clean_options_data(puts_data)
 
     # Allow user to select expiry date
+    st.subheader("Select Expiry Date")
     unique_expiries = calls_data['expiry'].dropna().unique()
     selected_expiry = st.selectbox("Choose an expiry date:", unique_expiries)
 
@@ -58,16 +62,6 @@ if ticker:
         filtered_calls = calls_data[calls_data['expiry'] == selected_expiry]
         filtered_puts = puts_data[puts_data['expiry'] == selected_expiry]
 
-        # Identify Butterfly Spread Opportunities
-        st.write("### Identified Butterfly Spread Opportunities")
-        butterfly_opportunities = identify_opportunities(filtered_calls, filtered_puts)
-
-        if butterfly_opportunities:
-            st.dataframe(butterfly_opportunities)  # Only this table is shown
-        else:
-            st.write("No butterfly spread opportunities identified.")
-
-       # Plot Volatility Skew and provide interpretation
-st.subheader("Implied Volatility Skew")
-plot_skew_with_interpretation(st, filtered_calls, filtered_puts)
-
+        # Plot Volatility Skew and Display Interpretation
+        st.subheader("Volatility Skew")
+        plot_skew_with_interpretation(st, filtered_calls, filtered_puts)
