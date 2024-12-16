@@ -63,16 +63,24 @@ if ticker:
         filtered_puts = puts_data[puts_data['expiry'] == selected_expiry]
 
         # Identify and display Butterfly Spread Opportunities
-st.subheader("Identified Butterfly Spread Opportunities")
-butterfly_opportunities = identify_opportunities(filtered_calls, filtered_puts)
+        st.subheader("Identified Butterfly Spread Opportunities")
+        butterfly_opportunities = identify_opportunities(filtered_calls, filtered_puts)
 
-if butterfly_opportunities:
-    opportunities_df = pd.DataFrame(butterfly_opportunities)
-    st.dataframe(opportunities_df)
-else:
-    st.write("No butterfly spread opportunities identified.")
-
+        if butterfly_opportunities:
+            opportunities_df = pd.DataFrame(butterfly_opportunities)
+            st.dataframe(opportunities_df)
+        else:
+            st.write("No butterfly spread opportunities identified.")
 
         # Plot Volatility Skew and Display Interpretation
         st.subheader("Volatility Skew")
         plot_skew_with_interpretation(st, filtered_calls, filtered_puts)
+
+        # Additional Interpretation Below
+        st.subheader("Interpretation of the Skew")
+        st.write("""
+        The implied volatility skew highlights market sentiment:
+        - **Higher IV for puts** indicates bearish sentiment, as traders are willing to pay more for downside protection.
+        - **Higher IV for calls** may signal bullish sentiment or hedging activity.
+        """)
+
