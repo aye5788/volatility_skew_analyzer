@@ -5,6 +5,7 @@ from src.fetch_data import fetch_options_data
 from src.preprocess_data import preprocess_options_data
 from src.visualize import plot_skew_with_interpretation
 from src.interpret_skew import identify_opportunities
+st.set_page_config(layout="wide")
 
 # Helper function to clean options data
 def clean_options_data(df):
