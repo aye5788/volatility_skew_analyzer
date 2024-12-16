@@ -1,3 +1,4 @@
+import pandas as pd
 def identify_opportunities(calls_df, puts_df, threshold=0.05):
     """
     Identify opportunities for butterfly spreads with metrics and option type.
