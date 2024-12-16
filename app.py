@@ -67,6 +67,7 @@ if ticker:
         else:
             st.write("No butterfly spread opportunities identified.")
 
-        # Plot Volatility Skew with Butterfly Opportunities
-        st.subheader("Volatility Skew with Opportunities")
-        plot_skew_with_opportunities(st, filtered_calls, filtered_puts, butterfly_opportunities)
+       # Plot Volatility Skew and provide interpretation
+st.subheader("Implied Volatility Skew")
+plot_skew_with_interpretation(st, filtered_calls, filtered_puts)
+
