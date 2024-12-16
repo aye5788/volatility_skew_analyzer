@@ -8,23 +8,15 @@ from src.interpret_skew import identify_opportunities
 
 # Helper function to clean options data
 def clean_options_data(df):
-    """
-    Cleans options data by extracting ticker, expiry, and strike columns.
-    Removes unnecessary columns for clarity.
-    """
-    # Extract expiry date from contractSymbol
     df['expiry'] = df['contractSymbol'].apply(
         lambda x: re.search(r'(\d{6})', x).group(1) if re.search(r'(\d{6})', x) else None
     )
     df['expiry'] = pd.to_datetime(df['expiry'], format='%y%m%d', errors='coerce')
-    
-    # Extract ticker (part before numeric in contractSymbol)
     df['ticker'] = df['contractSymbol'].apply(lambda x: re.split(r'(\d)', x, 1)[0])
 
     # Keep only relevant columns
     df = df[['ticker', 'expiry', 'strike', 'bid', 'ask', 'lastPrice', 'impliedVolatility']]
-    df = df.rename(columns={'lastPrice': 'last_price'})  # Rename for clarity
-    
+    df = df.rename(columns={'lastPrice': 'last_price'})
     return df
 
 # Streamlit App Title
@@ -72,15 +64,14 @@ if ticker:
         else:
             st.write("No butterfly spread opportunities identified.")
 
-        # Plot Volatility Skew and Display Interpretation
+        # Plot Volatility Skew
         st.subheader("Volatility Skew")
         plot_skew_with_interpretation(st, filtered_calls, filtered_puts)
 
-        # Additional Interpretation Below
+        # Additional Interpretation
         st.subheader("Interpretation of the Skew")
         st.write("""
         The implied volatility skew highlights market sentiment:
         - **Higher IV for puts** indicates bearish sentiment, as traders are willing to pay more for downside protection.
         - **Higher IV for calls** may signal bullish sentiment or hedging activity.
         """)
-
