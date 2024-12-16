@@ -1,65 +1,64 @@
 import matplotlib.pyplot as plt
-import pandas as pd
 
 def plot_skew_with_interpretation(st, calls_df, puts_df):
     """
-    Plots the implied volatility skew for calls and puts.
-    Dynamically adjusts axis scaling and improves readability.
-
-    Args:
-        st: Streamlit object for display.
-        calls_df (pd.DataFrame): DataFrame containing calls data.
-        puts_df (pd.DataFrame): DataFrame containing puts data.
+    Plot the implied volatility skew and provide interpretation for the skew.
+    Adjust chart width dynamically without affecting other elements.
     """
+    # Adjust chart width only (12 is the width, 6 is the height)
+    fig, ax = plt.subplots(figsize=(12, 6))  
 
-    # Set up the plot
-    fig, ax = plt.subplots(figsize=(10, 6))
-
-    # Plot IV skew for calls and puts
+    # Plot Implied Volatility for Calls
     ax.plot(
-        calls_df['strike'], 
-        calls_df['impliedVolatility'], 
-        label="Calls IV", 
-        marker='o', 
+        calls_df['strike'],
+        calls_df['impliedVolatility'],
+        marker='o',
         linestyle='-',
-        color="tab:blue"
-    )
-    ax.plot(
-        puts_df['strike'], 
-        puts_df['impliedVolatility'], 
-        label="Puts IV", 
-        marker='o', 
-        linestyle='-',
-        color="tab:orange"
+        label='Calls IV',
+        color='tab:blue'
     )
 
-    # Set dynamic x-axis scaling
-    min_strike = min(calls_df['strike'].min(), puts_df['strike'].min())
-    max_strike = max(calls_df['strike'].max(), puts_df['strike'].max())
-    ax.set_xlim(min_strike - 5, max_strike + 5)  # Add a buffer around strikes
+    # Plot Implied Volatility for Puts
+    ax.plot(
+        puts_df['strike'],
+        puts_df['impliedVolatility'],
+        marker='o',
+        linestyle='-',
+        label='Puts IV',
+        color='tab:orange'
+    )
 
-    # Improve readability
-    ax.set_title("Implied Volatility Skew", fontsize=14)
-    ax.set_xlabel("Strike Price", fontsize=12)
-    ax.set_ylabel("Implied Volatility", fontsize=12)
-    ax.tick_params(axis='both', which='major', labelsize=10)
+    # Titles and labels
+    ax.set_title("Implied Volatility Skew")
+    ax.set_xlabel("Strike Price")
+    ax.set_ylabel("Implied Volatility")
+    ax.legend()
+
+    # Grid and layout adjustment
     ax.grid(True, linestyle='--', alpha=0.5)
-    ax.legend(fontsize=10)
 
-    # Tighten layout
-    plt.tight_layout()
-
-    # Display plot
+    # Display the chart in Streamlit
     st.pyplot(fig)
 
-    # Interpretation of the skew
+    # Generate interpretation of the skew
+    skew_interpretation = interpret_skew(calls_df, puts_df)
     st.subheader("Interpretation of the Skew")
-    avg_call_iv = calls_df['impliedVolatility'].mean()
-    avg_put_iv = puts_df['impliedVolatility'].mean()
+    st.write(skew_interpretation)
 
-    if avg_call_iv > avg_put_iv:
-        st.write("The IV for calls is higher than puts. This may indicate a bullish sentiment.")
-    elif avg_call_iv < avg_put_iv:
-        st.write("The IV for puts is higher than calls. This may indicate a bearish sentiment.")
+
+def interpret_skew(calls_df, puts_df):
+    """
+    Generate a basic interpretation of the implied volatility skew.
+    - Checks if puts IV > calls IV to infer bearish sentiment.
+    """
+    # Calculate the mean implied volatility for calls and puts
+    avg_calls_iv = calls_df['impliedVolatility'].mean()
+    avg_puts_iv = puts_df['impliedVolatility'].mean()
+
+    # Compare average IVs to determine skew sentiment
+    if avg_puts_iv > avg_calls_iv:
+        return "The IV for puts is higher than calls. This may indicate a bearish sentiment."
+    elif avg_calls_iv > avg_puts_iv:
+        return "The IV for calls is higher than puts. This may indicate a bullish sentiment."
     else:
-        st.write("The IV for calls and puts are similar. The market sentiment appears neutral.")
+        return "The IV for calls and puts is roughly the same. Sentiment appears neutral."
